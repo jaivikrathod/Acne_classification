@@ -27,8 +27,8 @@ def detect_acne_marks(image):
     for contour in contours:
         x, y, w, h = cv2.boundingRect(contour)
 
-        # if((x+30) > (x+w)):
-        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), 2)  # Red rectangles
+        if((x+w) > (x+3) and(x+w) < (x+20) and (y+h) < (y+20) ):
+         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), 2)  # Red rectangles
 
     return image
 
@@ -80,5 +80,5 @@ def main(image_path):
     cv2.destroyAllWindows()
 
 # Run the function with the path to your image
-main('acne11.jpg')
+main('acne.jpg')
 # main('acne4.png')
