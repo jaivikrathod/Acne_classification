@@ -75,10 +75,10 @@ def main(image_path):
     processed_image = detect_acne_marks(filtered_image)
 
     # Display the final image with detected acne marks
-    cv2.imshow('Detected Acne Marks', processed_image)
+    # cv2.imshow('Detected Acne Marks', processed_image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-# Run the function with the path to your image
+
 # main(image_path)
 # main('acne4.png')
