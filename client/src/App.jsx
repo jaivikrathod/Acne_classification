@@ -21,6 +21,7 @@ const App = () => {
   };
 
   const handleUpload = async () => {
+    setResult(null);
     if (!file) {
       toast.error("No file selected!");
       return;
@@ -37,10 +38,10 @@ const App = () => {
       });
       if(res.data.isFace==1){
         toast.success(res.data.message);
+        setResult(res.data);
       }else{
         toast.error(res.data.message);
       }
-      setResult(res.data.result);
       fileInputRef.current.value = null;
     } catch (error) {
       toast.error(error.response?.data?.error || "Error uploading file!");
@@ -121,7 +122,7 @@ const App = () => {
            <div className="mt-8">
              <h4 className="font-semibold text-gray-800 text-lg text-center">Suggested Medicines:</h4>
              <ul className="list-none mt-4 space-y-2 text-gray-700 text-center">
-               {result["suggested medicine"].map((medicine, index) => (
+               {result["suggested_medicine"].map((medicine, index) => (
                  <li key={index} className="bg-blue-100 inline-block ml-4 px-4 py-2 rounded-lg text-blue-900">
                    {medicine}
                  </li>

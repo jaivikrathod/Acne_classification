@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
-from filter5 import main
+from filter4 import main
 
 # Create Flask app
 app = Flask(__name__)
@@ -42,9 +42,9 @@ def upload_image():
         #     'suggested medicine' :['none']
         # }
             
-        # return jsonify({"message": "No acne detected", "result": result}), 200
+        return jsonify(result), 200
         # return jsonify({"message": "No Face Detected", "result": result,"isFace":1}), 200
-        return jsonify({"message": "Multiple faces Detected", "result": result,"isFace":2}), 200
+        # return jsonify({"message": "Multiple faces Detected", "result": result,"isFace":2}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 if __name__ == "__main__":
