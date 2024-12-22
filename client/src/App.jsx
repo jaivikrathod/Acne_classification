@@ -36,10 +36,14 @@ const App = () => {
           "Content-Type": "multipart/form-data",
         },
       });
-      if(res.data.isFace==1){
-        toast.success(res.data.message);
+      if (res.data.isFace == 1) {
+        if (res.data.severety_level == 0) {
+          toast.success("No Acne Detected");
+        }else{
+          toast.success(res.data.message);
+        }
         setResult(res.data);
-      }else{
+      } else {
         toast.error(res.data.message);
       }
       fileInputRef.current.value = null;
@@ -57,7 +61,7 @@ const App = () => {
 
   return (
     <>
-      <header className="flex flex-col justify-center bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-center shadow-lg" style={{height:"70px"}}>
+      <header className="flex flex-col justify-center bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-center shadow-lg" style={{ height: "70px" }}>
         <h1 className="text-3xl font-extrabold tracking-wide">Acne Classification</h1>
         <p className="text-sm font-light">Upload an image and get an AI-powered analysis</p>
       </header>
@@ -105,32 +109,32 @@ const App = () => {
           </div>
 
           {result && (
-           <div className="bg-gradient-to-r from-white to-blue-50 shadow-lg rounded-lg p-6 flex-grow detail-container border border-gray-200">
-           <h3 className="text-2xl text-center font-bold text-blue-600 mb-6">
-             Analysis Results
-           </h3>
-           <div className="text-center space-y-4">
-             <p className="text-gray-800">
-               <span className="font-medium text-lg text-gray-900">Detected Acne Marks:</span>{" "}
-               <span className="text-gray-700 text-lg">{result.Detected_acne_marks}</span>
-             </p>
-             <p className="text-gray-800">
-               <span className="font-medium text-lg text-gray-900">Severity Level:</span>{" "}
-               <span className="text-gray-700 text-lg">{result.severety_level}</span>
-             </p>
-           </div>
-           <div className="mt-8">
-             <h4 className="font-semibold text-gray-800 text-lg text-center">Suggested Medicines:</h4>
-             <ul className="list-none mt-4 space-y-2 text-gray-700 text-center">
-               {result["suggested_medicine"].map((medicine, index) => (
-                 <li key={index} className="bg-blue-100 inline-block ml-4 px-4 py-2 rounded-lg text-blue-900">
-                   {medicine}
-                 </li>
-               ))}
-             </ul>
-           </div>
-         </div>
-         
+            <div className="bg-gradient-to-r from-white to-blue-50 shadow-lg rounded-lg p-6 flex-grow detail-container border border-gray-200">
+              <h3 className="text-2xl text-center font-bold text-blue-600 mb-6">
+                Analysis Results
+              </h3>
+              <div className="text-center space-y-4">
+                {/* <p className="text-gray-800">
+                  <span className="font-medium text-lg text-gray-900">Detected Acne Marks:</span>{" "}
+                  <span className="text-gray-700 text-lg">{result.Detected_acne_marks}</span>
+                </p> */}
+                <p className="text-gray-800">
+                  <span className="font-medium text-lg text-gray-900">Severity Level:</span>{" "}
+                  <span className="text-gray-700 text-lg">{result.severety_level}</span>
+                </p>
+              </div>
+              <div className="mt-8">
+                <h4 className="font-semibold text-gray-800 text-lg text-center">Suggested Medicines:</h4>
+                <ul className="list-none mt-4 space-y-2 text-gray-700 text-center">
+                  {result["suggested_medicine"].map((medicine, index) => (
+                    <li key={index} className="bg-blue-100 inline-block ml-4 px-4 py-2 rounded-lg text-blue-900">
+                      {medicine}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
           )}
         </div>
       </div>

@@ -16,8 +16,8 @@ detected_face_height=0
 def detect_acne_marks(face_detected_image):
 
     removed_eye_pic = detect_eyes_lips(face_detected_image)
-    # image = apply_filters(removed_eye_pic)
-    image = removed_eye_pic
+    image = apply_filters(removed_eye_pic)
+    # image = removed_eye_pic
     # Convert the image to HSV color space for color-based thresholding
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
@@ -54,13 +54,43 @@ def detect_acne_marks(face_detected_image):
     return counter
 
 # Function to apply filters to enhance the image
-def apply_filters(image, brightness=-100, contrast=250, saturation=80, sharpness=100):
+# def apply_filters(image, brightness=-100, contrast=250, saturation=80, sharpness=100):
+#     from PIL import Image, ImageEnhance
+#     pil_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+
+#     # Brightness adjustment
+#     enhancer = ImageEnhance.Brightness(pil_image)
+#     pil_image = enhancer.enhance(1 + brightness / 255.0)
+
+#     # Contrast adjustment
+#     enhancer = ImageEnhance.Contrast(pil_image)
+#     pil_image = enhancer.enhance(1 + contrast / 255.0)
+
+#     # Convert back to OpenCV format
+#     image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
+
+#     # Saturation adjustment
+#     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+#     hsv_image[..., 1] = cv2.add(hsv_image[..., 1], saturation)
+#     image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
+
+#     # Sharpness adjustment using a kernel
+#     kernel = np.array([[-1, -1, -1], [-1, 9 + sharpness / 25, -1], [-1, -1, -1]])
+#     image = cv2.filter2D(image, -1, kernel)
+
+#     return image
+
+
+
+
+
+def apply_filters(image, brightness=-100, contrast=200, saturation=100, sharpness=100, redness_boost=5):
     from PIL import Image, ImageEnhance
     pil_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
-    # Brightness adjustment
-    enhancer = ImageEnhance.Brightness(pil_image)
-    pil_image = enhancer.enhance(1 + brightness / 255.0)
+    # # Brightness adjustment
+    # enhancer = ImageEnhance.Brightness(pil_image)
+    # pil_image = enhancer.enhance(1 + brightness / 255.0)
 
     # Contrast adjustment
     enhancer = ImageEnhance.Contrast(pil_image)
@@ -72,6 +102,23 @@ def apply_filters(image, brightness=-100, contrast=250, saturation=80, sharpness
     # Saturation adjustment
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     hsv_image[..., 1] = cv2.add(hsv_image[..., 1], saturation)
+
+    # Boost redness by increasing saturation and value for red tones
+    lower_red_1 = np.array([0, 50, 50])  # Lower range for red
+    upper_red_1 = np.array([20, 255, 255])
+    lower_red_2 = np.array([160, 50, 50])  # Upper range for red
+    upper_red_2 = np.array([200, 255, 255])
+
+    # Create masks for red tones
+    mask1 = cv2.inRange(hsv_image, lower_red_1, upper_red_1)
+    mask2 = cv2.inRange(hsv_image, lower_red_2, upper_red_2)
+    red_mask = cv2.bitwise_or(mask1, mask2)
+
+    # Apply redness boost to the masked areas
+    hsv_image[..., 1] = cv2.add(hsv_image[..., 1], redness_boost, mask=red_mask)  # Boost saturation
+    hsv_image[..., 2] = cv2.add(hsv_image[..., 2], redness_boost, mask=red_mask)  # Boost brightness
+
+    # Convert back to BGR
     image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
 
     # Sharpness adjustment using a kernel
@@ -79,8 +126,6 @@ def apply_filters(image, brightness=-100, contrast=250, saturation=80, sharpness
     image = cv2.filter2D(image, -1, kernel)
 
     return image
-
-
 
 def detect_face(image):
     global detected_face_x, detected_face_y, detected_face_width, detected_face_height
@@ -188,21 +233,33 @@ def main(image_path):
     response = detect_acne_marks(image)
         
 
-    if(response>25):
-        severety_level=5
-        suggested_medicine=['abcd','pqrs']
-    elif(response>20):
-        severety_level=4
-        suggested_medicine=['abcd2','pqrs']
-    elif(response>15):
-        severety_level=3
-        suggested_medicine=['abcd3','pqrs']
-    elif(response>10):
-        severety_level=2
-        suggested_medicine=['abcd4','pqrs']
-    elif(response>5):
-        severety_level=1
-        suggested_medicine=['abcd5','pqrs']
+    medicine_suggestions = {
+    5: ['Isotretinoin', 'Clindamycin Gel','Consult a dermetologist'],
+    4: ['Doxycycline', 'Adapalene Gel'],
+    3: ['Benzoyl Peroxide', 'Salicylic Acid'],
+    2: ['Niacinamide', 'Azelaic Acid'],
+    1: ['Tea Tree Oil', 'Mild Cleanser'],
+    0: ['No need to take any medication']
+}
+
+    # Determine severity level and suggest medicines
+    if response > 75:
+        severety_level = 5
+    elif response > 60:
+        severety_level = 4
+    elif response > 45:
+        severety_level = 3
+    elif response > 30:
+        severety_level = 2
+    elif response > 15:
+        severety_level = 1
+    else:
+        severety_level = 0
+     
+    
+    
+    suggested_medicine = medicine_suggestions[severety_level]
+    
     result = {"message": "Acne Detected","isFace":len(faces),"Detected_acne_marks":response,"severety_level":severety_level,"suggested_medicine":suggested_medicine}
     print(result)
     return result
