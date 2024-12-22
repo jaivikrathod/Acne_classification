@@ -34,17 +34,8 @@ def upload_image():
     # Call the main function from filter5.py
     try:
         # Assuming 'main' function expects the file path
-        result = main(file_path)  
-        # 0-9 [1]  10-15[2] 16-25[3] 26-32[4] 32< [5]  
-        # result ={
-        #     'Detected_acne_marks' : "0",
-        #     'severety_level' :0,
-        #     'suggested medicine' :['none']
-        # }
-            
+        result = main(file_path)            
         return jsonify(result), 200
-        # return jsonify({"message": "No Face Detected", "result": result,"isFace":1}), 200
-        # return jsonify({"message": "Multiple faces Detected", "result": result,"isFace":2}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 if __name__ == "__main__":

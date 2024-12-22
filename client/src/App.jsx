@@ -9,7 +9,7 @@ const App = () => {
   const [file, setFile] = useState(null);
   const [result, setResult] = useState(null); // State for storing response result
   const fileInputRef = useRef(null);
-
+  const [isLoading, setIsLoading] = useState(false);
   const handleImageUpload = (event) => {
     const uploadedFile = event.target.files[0];
     if (uploadedFile && (uploadedFile.type === "image/jpeg" || uploadedFile.type === "image/png")) {
@@ -30,6 +30,7 @@ const App = () => {
     const formData = new FormData();
     formData.append("file", file);
 
+    setIsLoading(true);
     try {
       const res = await axios.post("http://127.0.0.1:5000/upload", formData, {
         headers: {
@@ -37,18 +38,29 @@ const App = () => {
         },
       });
       if (res.data.isFace == 1) {
+        setTimeout(() => {
         if (res.data.severety_level == 0) {
           toast.success("No Acne Detected");
-        }else{
+        } else {
           toast.success(res.data.message);
         }
         setResult(res.data);
+          setIsLoading(false);
+        }, 2000);
+
       } else {
-        toast.error(res.data.message);
+        setTimeout(() => {
+          toast.error(res.data.message);
+          setIsLoading(false);
+        }, 2000);
+
       }
       fileInputRef.current.value = null;
     } catch (error) {
-      toast.error(error.response?.data?.error || "Error uploading file!");
+      setTimeout(() => {
+        toast.error(error.response?.data?.error || "Error uploading file!");
+        setIsLoading(false);
+      }, 2000);
     }
   };
 
@@ -138,6 +150,12 @@ const App = () => {
           )}
         </div>
       </div>
+
+      {isLoading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="loader border-t-4 border-b-4 border-blue-500 rounded-full w-16 h-16 animate-spin"></div>
+        </div>
+      )}
 
       <Toaster />
     </>
